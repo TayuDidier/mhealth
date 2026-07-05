@@ -33,3 +33,6 @@ Thumbs.db
 
 # Vite
 *.local
+
+# Vite temp config artifacts
+vite.config.js.timestamp-*

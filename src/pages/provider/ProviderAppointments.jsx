@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../supabaseClient'
 import { SEED_APPOINTMENTS, SEED_PATIENTS } from '../../data/seedData'
+import { HOSPITAL } from '../../config/hospital'
 import { formatDate, formatTime } from '../../utils/dateHelpers'
 import PageHeader from '../../components/PageHeader'
 import AppointmentCard from '../../components/AppointmentCard'
@@ -95,7 +96,7 @@ export default function ProviderAppointments() {
         provider_id: profile?.id || 'provider-1',
         datetime,
         status: 'upcoming',
-        location: scheduleForm.location,
+        location: scheduleForm.location || HOSPITAL.name,
         notes: '',
         reminder_sent: false,
       }
@@ -109,7 +110,7 @@ export default function ProviderAppointments() {
           patient_id: scheduleForm.patient_id,
           provider_id: profile.id,
           datetime,
-          location: scheduleForm.location,
+          location: scheduleForm.location || HOSPITAL.name,
           status: 'upcoming',
         })
         .select('*, patient:users!appointments_patient_id_fkey(name)')
@@ -222,7 +223,9 @@ export default function ProviderAppointments() {
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Location</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  Location <span className="font-normal text-gray-400">(optional room — defaults to {HOSPITAL.name})</span>
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. Clinic Room 3"
