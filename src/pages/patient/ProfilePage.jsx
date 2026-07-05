@@ -23,6 +23,7 @@ export default function ProfilePage() {
     emergency_contact_phone: profile?.emergency_contact_phone || '',
   })
   const [savingContact, setSavingContact] = useState(false)
+  const [contactError, setContactError] = useState('')
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
@@ -52,13 +53,12 @@ export default function ProfilePage() {
       ])
       const providerIds = (provUsers || []).map(u => u.id)
       const { data: provDetails } = providerIds.length
-        ? await supabase.from('providers').select('user_id, specialty, clinic_name').in('user_id', providerIds)
+        ? await supabase.from('providers').select('user_id, specialty').in('user_id', providerIds)
         : { data: [] }
       const list = (provUsers || []).map(u => ({
         id: u.id,
         name: u.name,
         specialty: provDetails?.find(d => d.user_id === u.id)?.specialty || '',
-        clinic_name: provDetails?.find(d => d.user_id === u.id)?.clinic_name || '',
       }))
       setProviders(list)
       const current = list.find(p => p.id === ppData?.assigned_provider_id) || null
@@ -107,8 +107,13 @@ export default function ProfilePage() {
 
   async function saveContact() {
     setSavingContact(true)
-    await updateProfile(contactForm)
+    setContactError('')
+    const { error } = await updateProfile(contactForm)
     setSavingContact(false)
+    if (error) {
+      setContactError(error.message || 'Could not save emergency contact. Please try again.')
+      return
+    }
     setEditingContact(false)
   }
 
@@ -227,7 +232,7 @@ export default function ProfilePage() {
         {/* Assigned Provider */}
         <AppCard className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-700 dark:text-gray-300 text-sm">My Provider</h3>
+            <h3 className="font-semibold text-gray-700 dark:text-gray-300 text-sm">My Doctor / Nurse</h3>
             {!changingProvider && (
               <button onClick={() => setChangingProvider(true)} className="text-xs text-primary font-semibold hover:underline">Change</button>
             )}
@@ -245,7 +250,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="text-left">
                       <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{p.name}</p>
-                      <p className="text-xs text-gray-500">{p.specialty}{p.clinic_name ? ` · ${p.clinic_name}` : ''}</p>
+                      <p className="text-xs text-gray-500">{p.specialty}</p>
                     </div>
                     {selectedProviderId === p.id && (
                       <span className="material-symbols-outlined text-primary ml-auto">check_circle</span>
@@ -266,7 +271,7 @@ export default function ProfilePage() {
                   {assignedProvider ? assignedProvider.name : '—'}
                 </p>
                 {assignedProvider?.specialty && (
-                  <p className="text-xs text-gray-400">{assignedProvider.specialty}{assignedProvider.clinic_name ? ` · ${assignedProvider.clinic_name}` : ''}</p>
+                  <p className="text-xs text-gray-400">{assignedProvider.specialty}</p>
                 )}
               </div>
             </div>
@@ -298,8 +303,11 @@ export default function ProfilePage() {
                 type="tel"
                 className="w-full border border-gray-200 dark:border-gray-600 dark:bg-background-dark dark:text-white rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
+              {contactError && (
+                <p className="text-xs text-red-600 dark:text-red-400">{contactError}</p>
+              )}
               <div className="flex gap-2">
-                <AppButton variant="ghost" onClick={() => setEditingContact(false)} className="flex-1">Cancel</AppButton>
+                <AppButton variant="ghost" onClick={() => { setEditingContact(false); setContactError('') }} className="flex-1">Cancel</AppButton>
                 <AppButton onClick={saveContact} loading={savingContact} className="flex-1 justify-center">Save</AppButton>
               </div>
             </div>

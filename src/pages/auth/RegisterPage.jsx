@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import AppButton from '../../components/AppButton'
 
-const STEPS = ['Account', 'Details', 'Role']
+// Public sign-up is for patients only. Provider accounts are created by the
+// hospital admin (Provider Management), so there is no role-selection step.
+const STEPS = ['Account', 'Details']
 
 export default function RegisterPage() {
   const { signUp } = useAuth()
@@ -11,8 +13,9 @@ export default function RegisterPage() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [form, setForm] = useState({
-    name: '', email: '', password: '', phone: '', role: 'patient',
+    name: '', email: '', password: '', phone: '',
   })
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -36,17 +39,21 @@ export default function RegisterPage() {
       setStep(s => s + 1)
       return
     }
-    if (step < 2) { setStep(s => s + 1); return }
     setError('')
+    setNotice('')
     setLoading(true)
-    const { user, error: err } = await signUp(form.email, form.password, {
-      name: form.name, phone: form.phone, role: form.role,
+    const { session, error: err } = await signUp(form.email, form.password, {
+      name: form.name, phone: form.phone, role: 'patient',
     })
     setLoading(false)
     if (err) { setError(err.message); return }
-    if (form.role === 'patient') navigate('/onboarding')
-    else if (form.role === 'provider') navigate('/provider')
-    else navigate('/admin')
+    // No session means email confirmation is required — the user is NOT signed
+    // in yet, so don't route into the app (which would show a stale session).
+    if (!session) {
+      setNotice('Account created! Please check your email to confirm your address, then sign in.')
+      return
+    }
+    navigate('/onboarding')
   }
 
   return (
@@ -103,27 +110,13 @@ export default function RegisterPage() {
             </>
           )}
 
-          {step === 2 && (
-            <div className="space-y-3">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">I am a...</p>
-              {[
-                { value: 'patient', icon: 'pregnant_woman', label: 'Pregnant Woman', desc: 'Track my pregnancy and appointments' },
-                { value: 'provider', icon: 'stethoscope', label: 'Healthcare Provider', desc: 'Manage patients and appointments' },
-              ].map(opt => (
-                <button type="button" key={opt.value}
-                  onClick={() => set('role', opt.value)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${form.role === opt.value ? 'border-primary bg-lavender-soft dark:bg-primary/20' : 'border-gray-200 dark:border-gray-600 hover:border-primary/50'}`}>
-                  <span className={`material-symbols-outlined text-2xl ${form.role === opt.value ? 'text-primary' : 'text-gray-400'}`}>{opt.icon}</span>
-                  <div className="text-left">
-                    <p className={`font-semibold text-sm ${form.role === opt.value ? 'text-primary' : 'text-gray-700 dark:text-gray-200'}`}>{opt.label}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{opt.desc}</p>
-                  </div>
-                </button>
-              ))}
+          {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
+          {notice && (
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-3">
+              <p className="text-sm text-emerald-800 dark:text-emerald-300">{notice}</p>
+              <Link to="/login" className="text-sm text-primary font-semibold hover:underline">Go to sign in →</Link>
             </div>
           )}
-
-          {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
 
           <div className="flex gap-3">
             {step > 0 && (
@@ -132,7 +125,7 @@ export default function RegisterPage() {
               </AppButton>
             )}
             <AppButton type="submit" loading={loading} className="flex-1 justify-center">
-              {step < 2 ? 'Continue' : 'Create Account'}
+              {step < 1 ? 'Continue' : 'Create Account'}
             </AppButton>
           </div>
 

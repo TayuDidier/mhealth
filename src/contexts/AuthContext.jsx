@@ -47,6 +47,14 @@ export function AuthProvider({ children }) {
   async function fetchProfile(userId) {
     const { data: userData } = await supabase.from('users').select('*').eq('id', userId).single()
     if (!userData) return
+    // Providers carry specialty + status (needed for the approval gate); patients
+    // carry their pregnancy profile. Load whichever applies to this role.
+    if (userData.role === 'provider') {
+      const { data: prov } = await supabase
+        .from('providers').select('specialty, status').eq('user_id', userId).single()
+      setProfile({ ...userData, ...(prov || {}) })
+      return
+    }
     const { data: patientData } = await supabase
       .from('patient_profiles')
       .select('gestational_week, due_date, blood_type, gravida, para, assigned_provider_id, location, onboarding_complete, emergency_contact_name, emergency_contact_phone')
@@ -70,7 +78,13 @@ export function AuthProvider({ children }) {
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    return { user: data?.user, error }
+    if (error || !data?.user) return { user: data?.user, error }
+    // The Supabase auth user's `role` is the JWT role ("authenticated"), not the
+    // app role — fetch the real role so callers can route to the correct
+    // dashboard on the first navigation (no flash of the wrong portal).
+    const { data: userRow } = await supabase
+      .from('users').select('role').eq('id', data.user.id).single()
+    return { user: { ...data.user, role: userRow?.role }, error: null }
   }
 
   async function sendPasswordReset(email) {
@@ -92,14 +106,36 @@ export function AuthProvider({ children }) {
       localStorage.setItem('mhealth-demo-user', JSON.stringify(u))
       setUser(u)
       setProfile(u)
-      return { user: u, error: null }
+      return { user: u, session: { demo: true }, error: null }
     }
 
+    // Clear any existing session first. Without this, signing up while another
+    // account is still signed in (or when Supabase returns an obfuscated
+    // "email already exists" response with no new session) would leave the old
+    // session active — landing the new registrant in someone else's account.
+    await supabase.auth.signOut().catch(() => {})
+
     const { data, error } = await supabase.auth.signUp({ email, password, options: { data: metadata } })
-    if (!error && data.user) {
-      await supabase.from('users').insert({ id: data.user.id, email, ...metadata })
+    if (error) return { user: null, session: null, error }
+
+    // Supabase returns a user with an empty `identities` array when the email is
+    // already registered (obfuscated to prevent user enumeration). Surface it.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      return {
+        user: null, session: null,
+        error: { message: 'An account with this email already exists. Please sign in instead.' },
+      }
     }
-    return { user: data?.user, error }
+
+    // Only create the profile row once we hold the new user's session, so the
+    // RLS insert check (auth.uid() = id) passes. Surface any insert failure
+    // instead of silently leaving an auth user with no profile row.
+    if (data.session && data.user) {
+      const { error: insErr } = await supabase.from('users').insert({ id: data.user.id, email, ...metadata })
+      if (insErr) return { user: null, session: null, error: insErr }
+    }
+
+    return { user: data.user, session: data.session, error: null }
   }
 
   async function signOut() {
@@ -138,7 +174,10 @@ export function AuthProvider({ children }) {
       ops.push(supabase.from('users').update(userUpdates).eq('id', user.id))
     }
     if (Object.keys(patientUpdates).length > 0) {
-      ops.push(supabase.from('patient_profiles').upsert({ user_id: user.id, ...patientUpdates }))
+      // Conflict on user_id (its UNIQUE constraint), not the default primary key `id`.
+      // Otherwise the upsert tries to INSERT a new row and collides with the
+      // existing row's UNIQUE(user_id), failing with a duplicate-key error.
+      ops.push(supabase.from('patient_profiles').upsert({ user_id: user.id, ...patientUpdates }, { onConflict: 'user_id' }))
     }
 
     const results = await Promise.all(ops)

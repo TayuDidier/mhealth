@@ -104,13 +104,12 @@ export default function MessagesPage() {
       .from('users').select('id, name').eq('role', 'provider')
     if (!users?.length) { setAllProviders([]); return }
     const { data: details } = await supabase
-      .from('providers').select('user_id, specialty, clinic_name')
+      .from('providers').select('user_id, specialty')
       .in('user_id', users.map(u => u.id))
     setAllProviders(users.map(u => ({
       id: u.id,
       name: u.name,
       specialty: details?.find(d => d.user_id === u.id)?.specialty || '',
-      clinic_name: details?.find(d => d.user_id === u.id)?.clinic_name || '',
     })))
   }
 
@@ -196,8 +195,7 @@ export default function MessagesPage() {
   const filteredProviders = allProviders.filter(p =>
     !searchQuery ||
     p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.specialty?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.clinic_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    p.specialty?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   // ── INBOX VIEW ───────────────────────────────────────────────
@@ -288,9 +286,9 @@ export default function MessagesPage() {
             </div>
             <div>
               <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{p.name}</p>
-              {(p.specialty || p.clinic_name) && (
+              {p.specialty && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {[p.specialty, p.clinic_name].filter(Boolean).join(' · ')}
+                  {p.specialty}
                 </p>
               )}
             </div>

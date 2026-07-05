@@ -19,12 +19,17 @@ export default function PatientLayout() {
   }
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-background-light dark:bg-background-dark relative">
-      <OfflineBanner />
-      <main className="pb-20">
-        <Outlet />
-      </main>
-      <BottomNav items={NAV_ITEMS} />
+    // On desktop the app is a centered column; give the surrounding page a
+    // darker in-palette field so the column no longer melts into the background.
+    <div className="min-h-screen md:bg-[#ebe6e9] dark:md:bg-black">
+      {/* App column: framed with a border + shadow on desktop for clear contrast. */}
+      <div className="max-w-md mx-auto min-h-screen bg-background-light dark:bg-background-dark relative md:border-x md:border-[#e2dce0] dark:md:border-gray-800 md:shadow-xl">
+        <OfflineBanner />
+        <main className="pb-20">
+          <Outlet />
+        </main>
+        <BottomNav items={NAV_ITEMS} />
+      </div>
     </div>
   )
 }

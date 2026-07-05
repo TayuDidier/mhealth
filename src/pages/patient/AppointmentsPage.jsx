@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../supabaseClient'
 import { SEED_APPOINTMENTS, SEED_PROVIDERS } from '../../data/seedData'
+import { HOSPITAL } from '../../config/hospital'
 import { useNetwork } from '../../hooks/useNetwork'
 import { formatDate, formatTime } from '../../utils/dateHelpers'
 import PageHeader from '../../components/PageHeader'
@@ -19,7 +20,7 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showBook, setShowBook] = useState(false)
-  const [bookForm, setBookForm] = useState({ provider_id: '', date: '', time: '09:00', location: '' })
+  const [bookForm, setBookForm] = useState({ provider_id: '', date: '', time: '09:00' })
   const [booking, setBooking] = useState(false)
   const [bookError, setBookError] = useState('')
   const [bookSuccess, setBookSuccess] = useState(false)
@@ -31,12 +32,11 @@ export default function AppointmentsPage() {
     async function fetchProviders() {
       const { data: users } = await supabase.from('users').select('id, name').eq('role', 'provider')
       if (!users?.length) return
-      const { data: details } = await supabase.from('providers').select('user_id, specialty, clinic_name').in('user_id', users.map(u => u.id))
+      const { data: details } = await supabase.from('providers').select('user_id, specialty').in('user_id', users.map(u => u.id))
       setProviders(users.map(u => ({
         id: u.id,
         name: u.name,
         specialty: details?.find(d => d.user_id === u.id)?.specialty || '',
-        clinic_name: details?.find(d => d.user_id === u.id)?.clinic_name || '',
       })))
     }
     fetchProviders()
@@ -73,7 +73,7 @@ export default function AppointmentsPage() {
       const newAppt = {
         id: `appt-${Date.now()}`, patient_id: profile.id, patient_name: profile.name,
         provider_id: bookForm.provider_id, provider_name: provider.name || bookForm.provider_id,
-        datetime, status: 'upcoming', location: bookForm.location || provider.clinic_name || '',
+        datetime, status: 'upcoming', location: HOSPITAL.name,
         notes: '', reminder_sent: false,
       }
       if (isDemoMode) {
@@ -81,7 +81,7 @@ export default function AppointmentsPage() {
       } else {
         const { data, error: err } = await supabase.from('appointments').insert({
           patient_id: profile.id, provider_id: bookForm.provider_id,
-          datetime, status: 'upcoming', location: bookForm.location, reminder_sent: false,
+          datetime, status: 'upcoming', location: HOSPITAL.name, reminder_sent: false,
         }).select().single()
         if (err) throw err
         setAppointments(prev => [...prev, data])
@@ -170,8 +170,10 @@ export default function AppointmentsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Location</label>
-                  <input type="text" value={bookForm.location} onChange={e => setBookForm(f => ({ ...f, location: e.target.value }))} placeholder="Health facility name"
-                    className="w-full border border-gray-200 dark:border-gray-600 dark:bg-background-dark dark:text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded px-3 py-2.5 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-background-dark">
+                    <span className="material-symbols-outlined text-gray-400 text-lg">location_on</span>
+                    {HOSPITAL.name}
+                  </div>
                 </div>
                 {bookError && <ErrorBanner message={bookError} />}
                 <AppButton type="submit" loading={booking} className="w-full justify-center">Confirm Booking</AppButton>

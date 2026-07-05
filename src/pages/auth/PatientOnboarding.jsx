@@ -62,13 +62,12 @@ export default function PatientOnboarding() {
         .from('users').select('id, name').eq('role', 'provider')
       if (!users?.length) return
       const { data: details } = await supabase
-        .from('providers').select('user_id, specialty, clinic_name')
+        .from('providers').select('user_id, specialty')
         .in('user_id', users.map(u => u.id))
       setProviders(users.map(u => ({
         id: u.id,
         name: u.name,
         specialty: details?.find(d => d.user_id === u.id)?.specialty || '',
-        clinic_name: details?.find(d => d.user_id === u.id)?.clinic_name || '',
       })))
     }
     fetchProviders()
@@ -125,7 +124,7 @@ export default function PatientOnboarding() {
 
           {step === 2 && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Select your healthcare provider</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Select your assigned doctor or nurse</p>
               {providers.map(p => (
                 <button type="button" key={p.id}
                   onClick={() => set('assigned_provider_id', p.id)}
@@ -135,7 +134,7 @@ export default function PatientOnboarding() {
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{p.name}</p>
-                    <p className="text-xs text-gray-500">{p.specialty} · {p.clinic_name}</p>
+                    <p className="text-xs text-gray-500">{p.specialty}</p>
                   </div>
                 </button>
               ))}
