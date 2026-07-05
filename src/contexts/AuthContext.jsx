@@ -45,13 +45,16 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchProfile(userId) {
-    const { data: userData } = await supabase.from('users').select('*').eq('id', userId).single()
+    // Use maybeSingle() everywhere: a brand-new user (or a patient who hasn't
+    // finished onboarding) may not have the row yet, and single() would return
+    // an HTTP 406 instead of just null.
+    const { data: userData } = await supabase.from('users').select('*').eq('id', userId).maybeSingle()
     if (!userData) return
     // Providers carry specialty + status (needed for the approval gate); patients
     // carry their pregnancy profile. Load whichever applies to this role.
     if (userData.role === 'provider') {
       const { data: prov } = await supabase
-        .from('providers').select('specialty, status').eq('user_id', userId).single()
+        .from('providers').select('specialty, status').eq('user_id', userId).maybeSingle()
       setProfile({ ...userData, ...(prov || {}) })
       return
     }
@@ -59,7 +62,7 @@ export function AuthProvider({ children }) {
       .from('patient_profiles')
       .select('gestational_week, due_date, blood_type, gravida, para, assigned_provider_id, location, onboarding_complete, emergency_contact_name, emergency_contact_phone')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
     setProfile({ ...userData, ...(patientData || {}) })
   }
 
@@ -133,6 +136,11 @@ export function AuthProvider({ children }) {
     if (data.session && data.user) {
       const { error: insErr } = await supabase.from('users').insert({ id: data.user.id, email, ...metadata })
       if (insErr) return { user: null, session: null, error: insErr }
+      // Populate the profile now that the row exists. The auth state listener may
+      // have already tried (and found nothing) during the brief window before
+      // this insert committed, so set it explicitly to avoid a null profile.
+      setUser(data.user)
+      await fetchProfile(data.user.id)
     }
 
     return { user: data.user, session: data.session, error: null }
