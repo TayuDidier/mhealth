@@ -1,0 +1,566 @@
+Ministry of Higher Education
+LANDMARK METROPOLITAN UNIVERSITY INSTITUTE (LMUI) BUEA
+“Training Productive Leaders”
+
+
+
+
+
+School: Landmark School of Business and Social Science
+Department: Software Engineering
+
+	
+
+
+
+A Long Essay Submitted in Partial Fulfilment of the Requirements for the Award of a 
+Bachelor of Technology (B.Tech) Degree in software engineering
+
+Presented by
+Njialack Kamga Pharel Briol
+LMUI250911
+
+Supervisor 								 
+Md Kate								 
+
+
+CERTIFICATION
+This is to certify that this Long Essay, written and presented to Landmark Metropolitan University Institute by Njialack Kamga Pharel Briol in partial fulfilment of the requirements for the award of a Bachelor of Science (BSc) Degree in Software Engineering is original and suitable for public presentation.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEDICATION
+This work is dedicated first and foremost to God Almighty, whose grace, strength, and wisdom sustained me throughout every stage of this research and academic journey.
+To my beloved parents and family, whose unconditional love, sacrifices, and encouragement have been the foundation of every achievement in my life his work is as much yours as it is mine.
+To all pregnant women in Cameroon and across Africa who face daily challenges in accessing adequate maternal healthcare may this work contribute, however humbly, to improving your health outcomes and well-being.
+To my colleagues, friends, and all those who believed in me even when the road seemed uncertain your encouragement made the difference.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ACKNOWLEDGEMENTS
+All honour, glory, and gratitude belong first to God Almighty, the source of all knowledge and wisdom, without Whom this work would not have been possible.
+I wish to express my sincere and heartfelt appreciation to my supervisor, Md Kate, for her invaluable guidance, patience, constructive feedback, and unwavering support throughout the entire research process. Her expertise in software engineering and maternal health systems greatly shaped the direction and quality of this study.
+I am deeply grateful to the faculty and administration of the Landmark Metropolitan University Institute (LMUI), Buea, and in particular to the Landmark School of Business and Social Science and the Department of Software Engineering, for providing the academic environment and resources necessary for the completion of this research.
+To my fellow students and classmates in the Department of Software Engineering thank you for the collaborative spirit, late-night study sessions, and mutual encouragement that made this journey memorable.
+Finally, to my family my parents, siblings, and loved ones whose prayers, encouragement, and personal sacrifices enabled me to pursue and complete this degree: I am eternally grateful. This achievement belongs to all of you.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ABSTRACT
+This study presents the design and implementation of a mobile-first Progressive Web Application (PWA) referred to as the Antenatal Care Support System (MHealth) aimed at improving antenatal care services for pregnant women in Cameroon. The system was developed using an Agile Scrum methodology, progressing through four iterative sprints covering interface design, core feature development, module integration, and testing.
+
+The system is built on a React front-end framework with Supabase as the backend-as-a-service platform, providing PostgreSQL database management, authentication, and real-time data capabilities. SMS-based appointment reminders are delivered through the Twilio API to ensure reach even in low-connectivity environments. The system supports critical features such as health education content, appointment scheduling, and two-way in-app messaging between patients and healthcare providers.
+
+The implemented system comprises five core modules: a Reminder Engine for automated appointment notifications via Twilio SMS; a Knowledge Hub offering accessible pregnancy health education categorised by trimester; a Digital Health Passport for digital storage of antenatal visit records; a Provider Portal enabling healthcare workers to manage patients, schedule appointments, and respond to patient messages; and an Admin Dashboard enabling system administrators to manage provider accounts, oversee platform analytics, and maintain health education content. Two-way in-app messaging between patients and providers is integrated across the system to support direct communication.
+
+TABLE OF CONTENTS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF ABBREVIATIONS
+ANCAntenatal CareAPIApplication Programming InterfaceCLICommand Line InterfaceDBDatabaseDHSDemographic and Health SurveyHBMHealth Belief ModelHTTPHypertext Transfer ProtocolIDEIntegrated Development EnvironmentWHOWorld Health OrganizationJWTJSON Web TokenLTSLong-Term SupportMHealth / mHealthMobile / Web-based Health Application (Progressive Web App)NGONon-Governmental OrganisationnpmNode Package ManagerOTPOne-Time PasswordSMSShort Message ServiceSQLStructured Query LanguageTAMTechnology Acceptance ModelTPBTheory of Planned BehaviourUIUser InterfaceUXUser Experience
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF TABLES
+TableDescriptionPageTable 3.1Summary of Data Collection Methods29Table 3.2Tools and Technologies Used in System Development32Table 4.1System Classes and Their Key Attributes40Table 5.1Test Scenarios and Expected vs. Actual Outcomes54Table 6.1Summary of Recommendations and Future Work63
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIST OF FIGURES
+FigureDescriptionPageFigure 4.1System Architecture Diagram38Figure 4.2Use Case Diagram of the Antenatal Care Support System41Figure 4.3Class Diagram of the System43Figure 4.4Sequence Diagram for Appointment Reminder45Figure 4.5Sequence Diagram for Viewing Medical Records/Results46Figure 5.1User Authentication Test52Figure 5.2Login Screen55Figure 5.3Dashboard Interface56Figure 5.4Knowledge Hub Screen57Figure 5.5Provider Portal Interface58
+
+
+
+
+
+
+
+
+
+CHAPTER ONE
+INTRODUCTION
+1.1 BACKGROUND OF THE STUDY
+Pregnancy is a critical stage in a woman’s life that requires adequate medical attention to ensure the health and safety of both the mother and the unborn child. Antenatal care (ANC) plays a vital role in monitoring pregnancy progress, detecting complications early, and providing preventive healthcare services. Through antenatal care, pregnant women receive medical examinations, nutritional guidance, health education, and counseling on safe delivery practices (World Health Organization, 2016).
+In Cameroon, antenatal care services are available in public and private health facilities; however, utilization remains inconsistent. National health reports indicate that many women do not initiate antenatal care early or attend the recommended number of clinic visits. According to the Cameroon Demographic and Health Survey, a significant proportion of pregnant women begin antenatal care after the first trimester, limiting opportunities for early diagnosis and intervention (DHS Program, 2018). Factors such as distance to health facilities, transportation costs, limited awareness, and poor follow-up contribute to this challenge.
+In addition, antenatal care records in many health facilities are still managed manually using paper-based systems. These methods make patient tracking, appointment follow-up, and record retrieval slow and inefficient. Poor record management can result in missed appointments, loss of patient information, and weak communication between pregnant women and healthcare providers.
+With the rapid increase in smartphone and mobile internet usage across Cameroon, mobile health (MHealth) has emerged as a promising approach to improving healthcare delivery. Mobile-compatible web applications can be used to send reminders, provide health education, and facilitate communication between patients and healthcare workers (WHO, 2011). This study therefore focuses on the design and implementation of a mobile-first Progressive Web Application to support antenatal care by improving appointment adherence, access to health information, and two-way communication between pregnant women and healthcare providers.
+
+
+1.2 PROBLEM STATEMENT
+Despite the availability of antenatal care services in Cameroon, many pregnant women do not attend clinics regularly or receive adequate health education throughout pregnancy. Some women forget their appointment dates, while others are not fully aware of pregnancy danger signs that require urgent medical attention. As a result, preventable complications such as severe bleeding, high blood pressure, and infections may go unnoticed until they become life-threatening (WHO, 2020).
+Most antenatal care systems still rely heavily on manual processes, including paper records and face-to-face communication. These methods make it difficult for healthcare providers to follow up with patients, especially those living in remote or underserved areas. Poor follow-up systems contribute to missed appointments and delayed care, reducing the effectiveness of antenatal services.
+There is therefore a need for an improved system that enhances communication, provides timely reminders, and delivers pregnancy-related health information in an accessible manner. This study seeks to address these challenges through the development of a mobile-first Progressive Web Application designed to support antenatal care for pregnant women in Cameroon.
+1.3 OBJECTIVES OF THE STUDY
+Main objective 
+The aim of this study is to design and implement a mobile-first Progressive Web Application that supports antenatal care for pregnant women by providing health information, appointment reminders, and improved two-way communication between patients and healthcare providers.
+The specific objectives of the study:
+1. Identify the challenges faced by pregnant women in accessing and utilizing antenatal care services in Buea.
+2.  Design a mobile-first Progressive Web Application suitable for supporting antenatal care, providing pregnancy-related health information through the application, enabling automated appointment reminders for clinic visits, and facilitating two-way in-app messaging between pregnant women and their healthcare providers.
+3. Improve communication between pregnant women and healthcare providers.
+1.4 RESEARCH QUESTIONS
+The study seeks to answer the following research questions:
+* What challenges do pregnant women face in accessing antenatal care services?
+* How can a mobile-first Progressive Web Application support antenatal care services for pregnant women?
+* What features are necessary in a mobile-first web application designed for antenatal care?
+1.5 SIGNIFICANCE OF THE STUDY
+This study is significant to several stakeholders. Pregnant women will benefit from timely health information, appointment reminders, and increased awareness of pregnancy danger signs, which can encourage regular antenatal clinic attendance and early healthcare seeking. Healthcare providers will benefit from improved follow-up mechanisms and better communication with patients, leading to more effective antenatal care delivery.
+Health facilities may experience improved record management, reduced missed appointments, and better organization of antenatal services. In addition, the study will contribute to academic knowledge in the area of mobile health and maternal healthcare. It will also serve as a reference material for students, researchers, and system developers interested in using technology to improve maternal health services in Cameroon and similar settings.
+1.6 SCOPE AND LIMITATIONS OF THE STUDY
+Scope of the Study
+This study focuses on the design and implementation of a mobile-first Progressive Web Application for antenatal care. The system is intended to provide pregnancy-related health information, automated and manually triggered appointment reminders, two-way in-app messaging between patients and providers, and role-based access for patients, healthcare providers, and a system administrator. The study does not cover advanced clinical diagnosis or treatment but focuses on information delivery, communication support, and care coordination.
+Limitations of the Study
+The study may be limited by access to smartphones and internet connectivity, especially in rural areas. Some users may have limited experience using web applications, which could affect system adoption. Time and financial constraints may also limit the scope of system
+development and testing. Despite these limitations, the proposed system is expected to provide meaningful support for antenatal care services.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHAPTER TWO
+2.1 LITERATURE REVIEW 
+This chapter reviews literature related to mobile health systems (MHealth) used to support antenatal care (ANC), with emphasis on challenges and realities in Cameroon. Antenatal care is essential for monitoring pregnancy progress, detecting complications early, and supporting safe delivery outcomes. However, maternal and newborn health indicators remain a concern across many low- and middle-income countries, including Cameroon. According to World Health Organization reports, Cameroon continues to record a high maternal mortality ratio, indicating persistent risks to maternal health (WHO, 2024).
+In Cameroon, one major challenge affecting maternal health is late initiation of antenatal care. Data from the Cameroon Demographic and Health Survey indicate that only about 41% of pregnant women attend their first antenatal clinic visit during the first trimester, despite medical recommendations for early booking (DHS Program, 2018). Late attendance reduces the opportunity for early detection of complications and timely health education.
+Smartphone-based health interventions are increasingly recognized as practical solutions for improving healthcare access in settings like Cameroon. Mobile health (MHealth) systems help overcome barriers such as distance to health facilities and shortage of healthcare workers by delivering reminders, education, and follow-up support directly to pregnant women (WHO, 2011; WHO, 2018). This chapter also identifies gaps in existing studies that justify the design and implementation of a localized Progressive Web Application for antenatal care in Cameroon.
+2.2 CONCEPTUAL REVIEW 
+2.2.1 Mobile Health System for Antenatal Care
+A mobile health system for antenatal care is a digital platform designed to support pregnant women throughout pregnancy using devices such as smartphones or basic mobile phones. These systems typically provide services including appointment reminders, pregnancy-related information, danger sign alerts, and communication with healthcare providers (WHO, 2019).
+In Cameroon, mobile health systems are especially relevant in rural and semi-urban areas where access to health facilities is limited by long distances, transport costs, and limited medical staff. WHO antenatal care guidelines emphasize the importance of continuous contact with healthcare services throughout pregnancy, recommending a minimum of eight antenatal contacts for positive pregnancy outcomes (WHO, 2016). A mobile-first Progressive Web Application can help encourage early booking and consistent attendance by keeping pregnant women informed and engaged.
+2.2.2 Reminder Systems in Antenatal Care
+Reminder systems are information systems that notify users about important events or scheduled activities. In antenatal care, reminders are commonly used to inform pregnant women about clinic appointments, immunization schedules, and follow-up visits.
+In Cameroon, missed antenatal appointments are often caused by forgetfulness, household responsibilities, limited transport options, or lack of awareness about appointment schedules. Research shows that reminder-based mobile health interventions significantly reduce missed clinic visits and improve continuity of care (Free et al., 2013). These findings suggest that reminder systems can be effective tools for improving antenatal care attendance among pregnant women in Cameroon.
+2.2.3 Health Education for Pregnant Women
+Health education in antenatal care involves providing pregnant women with information on nutrition, hygiene, rest, physical activity, birth preparedness, and pregnancy danger signs. Effective health education empowers women to make informed decisions and seek medical care promptly when complications occur (WHO, 2020).
+In Cameroon, limited access to accurate maternal health information contributes to late reporting of pregnancy complications. Mobile health platforms provide an effective way to deliver health education messages in simple and understandable formats. Studies show that health education increases awareness of pregnancy danger signs and encourages early hospital visits (Amoakoh-Coleman 2016).
+2.2.4 Timely Antenatal Clinic Visits
+Timely antenatal clinic visits involve early registration and regular attendance at recommended intervals throughout pregnancy. According to WHO guidelines, early and frequent antenatal visits allow healthcare providers to monitor maternal and fetal health and provide appropriate interventions when necessary (WHO, 2016).
+In Cameroon, early antenatal attendance remains relatively low. Findings from the Cameroon Demographic and Health Survey show that many women still initiate antenatal care late in pregnancy (DHS Program, 2018). Studies using Cameroon national data also indicate that early antenatal care uptake is influenced by both individual and community-level factors, such as education level, place of residence, and access to healthcare facilities (Appiah 2022). Mobile health systems can help address these challenges by promoting early registration and reminding women of scheduled visits.
+2.2.5 Mobile Health Support
+Mobile health (MHealth) involves the use of smartphones, laptops, and other portable technologies to support healthcare services and public health activities (WHO, 2011). MHealth applications are used for health education, appointment reminders, disease monitoring, and communication between patients and healthcare providers.
+In Cameroon, MHealth solutions are suitable because  smart phone usage  has become widespread, even in rural areas. However, internet access may be limited, making SMS supported solutions more appropriate. Studies on MHealth in low- and middle-income countries indicate that such systems can improve maternal healthcare utilization, although challenges such as digital literacy and infrastructure limitations must be considered (Hall 2014; Lee 2015).
+2.3 THEORETICAL REVIEW
+2.3.1 Health Belief Model (HBM)
+The Health Belief Model explains health behavior based on individual perceptions of susceptibility, severity, benefits, and barriers (Rosenstock, 1974). In the context of antenatal care in Cameroon, some women may delay clinic visits because they perceive pregnancy as a normal process that does not require medical attention unless complications arise.
+A mobile-first Progressive Web Application can act as a cue to action by providing reminders and educational messages that increase awareness of pregnancy risks and the benefits of regular antenatal care. This can help improve attendance and early health-seeking behavior.
+2.3.2 Theory Of Planned Behavior (TPB)
+The Theory of Planned Behavior states that behavior is influenced by attitude, subjective norms, and perceived behavioral control (Ajzen, 1991). In Cameroon, antenatal care attendance may be influenced by family opinions, cultural beliefs, financial constraints, and access to health facilities. 
+Mobile reminder systems help improve perceived behavioral control by reducing forgetfulness and providing clear guidance on appointment schedules. This encourages positive intentions and consistent antenatal clinic attendance.
+2.3.3 Technology Acceptance Model (TAM)
+The Technology Acceptance Model explains technology usage based on perceived usefulness and perceived ease of use (Davis, 1989). For a mobile health application to be accepted by pregnant women in Cameroon, it must be simple, easy to navigate, and clearly beneficial.
+Systems that function on low-end smartphones, use simple language, and provide clear value are more likely to be accepted, especially in rural communities where digital literacy may be limited.
+2.4 EMPIRICAL REVIEW
+Empirical studies show that mobile health interventions improve healthcare service utilization, including antenatal care attendance. Systematic reviews indicate that reminder-based mobile health interventions increase appointment adherence and follow-up in maternal health services (Free 2013).
+Studies focusing on maternal and child health in low- and middle-income countries also report improved knowledge of pregnancy danger signs and better health-seeking behavior among women exposed to mobile health education (Lee 2015; Sondaal 2016). Evidence from African settings shows that smartphone-based interventions can improve completion of recommended antenatal visits.
+In Cameroon, national survey data indicate persistent late antenatal care initiation, despite improvements over previous years (DHS Program, 2018). Research further shows that both individual and community factors affect antenatal care uptake, highlighting the need for interventions that address awareness, reminders, and accessibility simultaneously (Appiah  2022).
+However, empirical studies also highlight challenges such as poor internet connectivity, language barriers, and low digital literacy. These findings suggest that mobile health systems for Cameroon should be simple, low-cost, and designed to perform well on limited internet connections.
+
+
+
+2.5 SUMMARY OF LITERATURE GAPS
+Based on the reviewed literature, the following gaps were identified:
+1. Many mobile health systems for antenatal care are designed for developed countries and may not be suitable for low-resource settings like Cameroon (WHO,2019).
+2. Several existing systems focus mainly on appointment reminders with limited health education content.
+3. Few systems integrate reminders, pregnancy tracking, health education, and communication with healthcare providers into a single platform (Lee  2015).
+4. Limited attention is given to systems that support both pregnant women and health care providers simultaneously
+5. Continued late initiation of antenatal care in Cameroon highlights the need for system that promote early registration and sustained attendance (DHS program, 2018: Appiah 2022) 
+
+These gaps justify the development of a localized mobile-first Progressive Web Application for antenatal care that is simple, accessible, and suitable for Cameroonians.
+
+
+
+
+
+
+
+
+
+
+
+
+CHAPTER THREE
+3.1 RESEARCH/DESIGN APPROACH
+To address the complexities of developing a mobile health system for low-resource settings, this study adopts an Agile Methodology based on the Scrum framework. The iterative nature of this approach helps mitigate the risks identified in Chapter One, particularly limited user technical knowledge and connectivity challenges.
+Development will proceed through small, manageable cycles called "Sprints"
+Sprint 1 (Planning & Prototyping): Initial design of the user interface (UI) with emphasis on simplicity and accessibility, informed by principles from the Technology Acceptance Model.
+Sprint 2 (Core Features): Development of the central database and the appointment reminder system.
+Sprint 3 (Education & Tracking): Integration of the health education library and pregnancy tracking modules.
+Sprint 4 (Testing & Refinement):  Beta testing with a small user group to refine features based on practical feedback.
+3.2 DATA COLLECTION METHODS
+A Mixed-Methods approach will be used to gather requirements for a system that effectively supports both pregnant women and healthcare providers:
+1.  Semi-Structured Interviews: One-on-one interviews with healthcare workers to identify the most critical pregnancy danger signs that should be emphasized in the education module.
+2. User Surveys: Simple questionnaires distributed to pregnant women to determine smartphone types and data access levels (for compatibility assessment) and preferred languages for notifications, as well as potential interest if such a system is built.
+
+
+	
+Table 3.1: Summary of Data Collection Methods
+MethodPurposeParticipantsSemi-structured InterviewsIdentify critical danger signs; understand provider workflow15 Healthcare WorkersUser Surveys (Questionnaires)Assess phone types, preferred language, and interest in app80 Pregnant WomenObservationUnderstand manual ANC record-keeping practices at facilitiesClinic Staff
+3.3 POPULATION AND SAMPLING
+Target Population: The study focuses on two primary groups:
+1. Pregnant women currently registered for antenatal care at community health centers.
+2. Healthcare providers (Nurses, Midwives, and Doctors) responsible for managing antenatal records.
+Sampling Technique: Purposive Sampling will be employed to select participants who can provide meaningful insights, such as women living far from health facilities or those with a history of missed appointments.
+Sample Size: Of the 80 pregnant women surveyed, approximately 30 were selected for hands-on usability testing of the system prototype. Similarly, of the 15 healthcare workers interviewed, 5 were engaged for in-depth system validation and feedback on the provider portal and communication module.
+1. Reminder Engine: Automatically generates local alerts for upcoming clinic visits, addressing the poor follow-up issue noted in the background.
+2. Knowledge Hub: A library of pregnancy health information on nutrition, hygiene, danger signs, and safe delivery, categorised by trimester and accessible within the application.
+3. Digital Health Passport: A digitized version of the traditional antenatal card that facilitates better tracking of medical check-ups and historical data.
+4. Provider Portal: A dedicated web interface allowing healthcare workers to view patient schedules, record visit notes, send direct communications, and respond to patient messages.
+5. Admin Dashboard: A management interface accessible only to the system administrator, enabling approval or deactivation of provider accounts, monitoring of platform-wide statistics (total patients, appointments, reminders sent), and management of Knowledge Hub content.
+3.4 TOOLS AND TECHNOLOGIES OVERVIEW
+The technology selection prioritizes simplicity, accessibility, and suitability for local conditions while ensuring a maintainable and cost-effective architecture.
+TechnologyTool / StackPurposeFront-End FrameworkReact (Vite)Responsive, component-based web applicationState ManagementuseState / useContextEfficient application state managementOffline SupportBrowser Cache / Service WorkerCaching of static assets and Knowledge Hub content for PWA install supportBackend-as-a-ServiceSupabaseDatabase, authentication, real-time capabilitiesDatabasePostgreSQL (via Supabase)Relational data storage with row-level securityAuthenticationSupabase AuthSecure user registration and loginSMS RemindersTwilio APIAppointment alerts without internet requirementDeploymentVercel / NetlifyFast global hosting with HTTPS and CI/CDIDEVisual Studio CodePrimary development environmentVersion ControlGit / GitHubSource code management and collaboration
+
+
+CHAPTER FOUR
+4.1 System Architecture and Design Overview
+This chapter presents the system design, architecture, models, and simulation of the Antenatal Care Support System. The design phase focused on translating the conceptual framework into a structured and functional system architecture.
+The system adopts a client-server architecture model. The Progressive Web Application (PWA) serves as the client interface used by pregnant women, healthcare providers, and a system administrator, each accessing a role-specific dashboard. The backend server manages authentication, data processing, storage, and synchronisation. The database stores user profiles, appointment schedules, health education content, medical records, in-app messages, and communication data. SMS appointment reminders are delivered via the Twilio API to ensure reach in low-connectivity environments.
+The architecture was designed with scalability, security, and seamless functionality in mind. To enable it function properly
+
+
+Fig 4.1 : System Architecture Diagram 
+
+
+4.2 System Models and Diagrams
+4.2.1 Use Case Diagram
+The Use Case Diagram illustrates interactions between system actors and system functionalities. The three primary actors are the Pregnant Woman, the Healthcare Provider, and the System Administrator.
+The Pregnant Woman can register, log in, view and book appointments, receive SMS reminders, access health education materials, and send in-app messages to her healthcare provider. The Healthcare Provider can manage patient records, schedule appointments, record visit notes, send SMS reminders, and reply to patient messages via the provider portal. The System Administrator can approve or deactivate provider accounts, view platform analytics, and manage Knowledge Hub content.
+
+       Figure 4.2: Use Case Diagram of the Antenatal Care Support System
+       
+
+
+4.2.2 Class Diagram
+The Class Diagram represents the structural design of the system by defining the main system classes, their attributes, methods, and relationships.
+Key classes include User, Appointment, Reminder, HealthContent, MedicalRecord, and Message. The User class relates to appointments, records, and communication. Appointment stores scheduling data, Reminder handles notification triggers, HealthContent stores educational materials, and MedicalRecord maintains antenatal visit data.
+
+                  Figure 4.3: Class Diagram of the System
+4.2.3 Sequence Diagrams
+Sequence diagrams were developed to model system behavior dynamically.
+(a) Appointment Reminder Sequence – The system checks upcoming appointments, triggers the reminder engine, communicates with the notification service, and delivers alerts to the user.
+
+        Figure 4.4: Sequence Diagram for Appointment Reminder
+ 
+(b) Viewing Medical Results / Records Sequence – The user requests medical records, the server queries the database, and the requested data is returned to the application.
+
+
+
+
+        4.5: Sequence Diagram for Viewing Medical Records/Results
+
+4.3 Simulation Environment and Setup
+The development environment was configured to simulate the complete Antenatal Care Support System locally before production deployment. Visual Studio Code served as the primary integrated development environment (IDE) throughout the development lifecycle.
+Development Environment Configuration:
+1. Code Editor: Visual Studio Code was configured with essential extensions including ESLint, Prettier, JavaScript (ES6) code snippets, and Tailwind CSS IntelliSense to streamline React development and maintain code quality.
+2. Node.js & npm: Node.js (v18.x LTS) and npm (v9.x) were installed to manage JavaScript dependencies and run the React development server.
+3. React Setup: The React application was bootstrapped using Vite for faster development builds and hot module replacement. The development server was configured to run on http://localhost:3000 with proxy settings for API requests.
+4. Supabase Local Development: Supabase CLI was installed to enable local development. The local Supabase stack was initialized using supabase init and started with supabase start, and its components
+5. Environment Variables: A .env.local file was created to store Supabase project URL and anon key for local development, with .gitignore configured to prevent sensitive credentials from being committed.
+6. Database Simulation: The PostgreSQL database was populated with mock data including simulated user profiles, appointment schedules, and health education content. Row-level security policies were tested using multiple test user accounts with different permission le
+
+4.4 Description of System Components
+4.4.1 Reminder Engine
+The Reminder Engine tracks appointment dates and generates alerts before scheduled clinic visits. Notifications are automatically triggered and delivered even when the application is running in the background.
+4.4.2 Knowledge Hub
+The Knowledge Hub provides pregnancy-related educational content categorized by trimester and topic. Content is cached by the Service Worker upon first load, allowing previously viewed articles to remain accessible when connectivity is limited.
+4.4.3 Digital Health Passport
+The Digital Health Passport stores antenatal visit records including blood pressure readings, weight tracking, and laboratory results. It enables continuous monitoring of pregnancy progress.
+4.4.4 Provider Communication Portal
+The Provider Portal enables healthcare workers to manage patient records, schedule appointments, and send direct notifications to improve follow-up efficiency.
+
+
+
+
+CHAPTER FIVE
+IMPLEMENTATION, TESTING, AND RESULTS
+5.1 Implementation Logic
+Here we have the overall summarized and simplified system logic of how the app will operate from and algorithmic stand point
+
+START
+INITIALIZATION
+APP_INIT:
+  Check network status
+  Load cached user session from IndexedDB
+  IF session exists THEN restore authentication state
+  Load cached health education content
+  Load cached appointments
+  Navigate to appropriate screen
+AUTHENTICATION
+AUTH_FLOW:
+  User enters email/password OR registers
+  Supabase Auth validates credentials
+  IF success THEN create session, fetch user profile
+  ELSE display error
+  Store session token in memory
+
+CORE USER JOURNEY - PREGNANT WOMAN
+HOME_DASHBOARD:
+  Display next appointment (from cache or online)
+  Display weekly health tip based on gestational age
+  Show quick action buttons
+VIEW_APPOINTMENTS:
+  IF online THEN fetch latest appointments from Supabase
+    UPDATE local cache
+  ELSE display cached appointments
+  Allow booking/cancelling/rescheduling
+BOOK_APPOINTMENT:
+  Check with provider availability (if online)
+  Validate date/time
+  Create appointment record in Supabase
+  IF offline THEN queue for sync
+  Confirm booking to user
+  Schedule reminder (24h before)
+READ_HEALTH_CONTENT:
+  Content filtered by gestational week
+  IF online AND new content available THEN download and cache
+  ELSE display cached content
+  Track view history
+RECEIVE_REMINDER:
+  Twilio SMS sent 24h before appointment
+  Message contains date, time, location/instructions
+
+PROVIDER_FLOW:
+  View all upcoming appointments
+  Access patient profiles and history
+  Chat with patients
+  Mark appointments as completed
+  Add appointment notes
+END
+Data synchronization occurs automatically when internet connectivity is available.
+
+5.2 Test Scenarios and Use Cases
+
+
+
+
+
+
+
+5.3 Results Presentation
+The simulation confirmed successful user authentication, accurate appointment scheduling, automatic reminder delivery via Twilio SMS, Knowledge Hub content caching, proper medical record storage, effective in-app messaging between patients and providers, and correct role-based access control across all three user roles.
+
+                           Figure 5.1: Login Screen
+
+                      Figure 5.3: Dashboard Interface
+
+                      Figure 5.4: Knowledge Hub Screen
+
+
+                       Figure 5.4: Provider Portal Interface
+5.4 Discussion of Results
+The Antenatal Care Support System effectively improves upon traditional paper-based systems by providing automated reminders, digital record management, improved communication, and accessible health education. All ten test scenarios returned successful outcomes, demonstrating the robustness of the system's core functionality.
+The architecture proved particularly effective during testing. Users were able to access health education content, view appointments, and queue new bookings provided an active internet connection.
+SMS-based appointment reminders via Twilio functioned correctly across all tested scenarios. This is especially significant for reaching users in low-connectivity environments where push notifications may not be reliable. The 24-hour advance reminder window was found to give users sufficient time to prepare for their clinic visits.
+The provider portal was well received during validation sessions with healthcare workers. The ability to view upcoming appointments, access patient histories, and send direct communications significantly reduced the manual effort previously required for patient follow-up.
+Challenges encountered during development included optimizing push notification delivery for low-end Android devices 
+Overall, the results demonstrate that the system achieves its stated objectives and demonstrates strong potential for real-world deployment in antenatal care facilities in Cameroon.
+
+
+CHAPTER SIX
+SUMMARY, CONCLUSION, AND RECOMMENDATIONS
+6.1 Summary of Findings
+This study focused on the design and implementation of an Antenatal Care Support System (MHealth) aimed at improving antenatal care services in Cameroon. The project was motivated by challenges including late initiation of antenatal visits, missed clinic appointments, inadequate access to pregnancy-related health education, and weak follow-up systems in many healthcare facilities.
+From the literature reviewed, mobile health technologies were found to significantly improve healthcare utilization. Reminder-based systems increase antenatal attendance, while mobile education platforms improve awareness of pregnancy danger signs. However, gaps were identified in existing systems, particularly the lack of an integrated, localized solution suitable for low-resource settings.
+Using an Agile (Scrum-based) methodology, the system was developed iteratively. The implemented system includes an automated appointment reminder engine, a accessible knowledge hub, a digital health passport for pregnancy tracking, and a provider communication portal.
+System testing confirmed that reminders generate correctly, educational content is cached for low-connectivity access, in-app messaging between patients and providers is functional, and role-based access controls operate as designed. The system aligns with the objectives of the study and addresses the identified problems.
+Overall, findings demonstrate that a localized mobile-first Progressive Web Application can improve appointment adherence, enhance maternal health awareness, and strengthen communication in antenatal care services.
+6.2 Conclusion
+The aim of this study was to design and implement an Antenatal Care Support System to support pregnant women throughout pregnancy. This objective was successfully achieved.
+The developed system provides structured support through appointment reminders, health education, and improved communication between healthcare providers and pregnant women. The implementation demonstrates that mobile health technology can effectively address gaps in maternal healthcare delivery.
+Designed with simplicity the system is suitable for low-resource environments. By promoting timely antenatal visits and improved health awareness, the system has the potential to reduce maternal health risks and improve pregnancy outcomes.
+In conclusion, mobile health technology represents a practical and scalable solution for strengthening antenatal care services in Cameroon and similar contexts.
+6.3 Limitations of the Study
+Despite successful implementation, several limitations were identified:
+1. Limited sample size during usability testing.
+2. Dependence on internet connectivity for synchronization and push notifications.
+3. Digital literacy challenges among some users.
+4. Time constraints limiting long-term evaluation.
+5. Financial constraints restricting large-scale deployment.
+These limitations highlight areas for further improvement and expansion.
+6.4 Recommendations and Future Work
+Based on the findings, the following recommendations are proposed:
+RecommendationRationale / Expected ImpactLarge-scale deployment across multiple health facilitiesBroaden system impact and validate performance in diverse clinical settingsAdd multilingual support (French, Pidgin, local languages)Improve accessibility for non-English speaking users in CameroonDevelop an SMS-only version for basic mobile phonesExtend reach to women without smartphones or stable data connectionsIntegrate with national health information systems (DHIS2)Enable data sharing with Ministry of Health and improve maternal health analyticsDevelop a native Android/iOS mobile applicationWhile the current system is implemented as a Progressive Web App, a dedicated native mobile application would further improve adoption, visibility, and access to device-level features such as push notifications and background sync.Partner with government bodies and NGOs for sustainabilityEnsure long-term funding, maintenance, and policy alignmentConduct longitudinal impact evaluation on maternal health outcomesGenerate evidence on the system's effect on maternal mortality and morbidity
+Future work should focus on full deployment, enhanced security, and long-term impact evaluation on maternal health outcomes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+REFERENCES
+[1] World Health Organization, WHO Recommendations on Antenatal Care for a Positive Pregnancy Experience, Geneva: WHO, 2016.
+[2] World Health Organization, Global Diffusion of eHealth: Making Universal Health Coverage Achievable, Geneva: WHO, 2011.
+[3] The DHS Program, Cameroon Demographic and Health Survey 2018, Yaoundé, Cameroon, 2018.
+[4] World Health Organization, Maternal Mortality Fact Sheet, Geneva: WHO, 2024.
+[5] World Health Organization, WHO Recommendations on Antenatal Care for a Positive Pregnancy Experience — Supplement to the 2016 Guidelines, Geneva: WHO, 2018.
+[6] World Health Organization, Digital Health: A Call for Government Leadership and Cooperation between ICT and Health, Geneva: WHO, 2019.
+[7] World Health Organization, WHO Guidelines for Strengthening Maternal Newborn and Child Health, Geneva: WHO, 2020.
+[8] C. Free, G. Phillips, L. Galli, L. Watson, L. Felix, P. Edwards, V. Patel, and A. Haines, "The effectiveness of web app-health technologies to improve health care service delivery processes: a systematic review," PLoS Medicine, vol. 10, no. 1, 2013.
+[9] S. H. Lee, J. E. Nurmatov, B. T. Nwaru, M. Mukherjee, L. Grant, and C. Pagliari, "Effectiveness of mHealth interventions for maternal, newborn and child health in low- and middle-income countries: systematic review and meta-analysis," BMC Public Health, vol. 15, 2015.
+[10] S. F. V. Sondaal, J. A. Browne, M. Amoakoh-Coleman, A. Borgstein, A. A. Miltenburg, E. Verwijs, and K. Klipstein-Grobusch, "Assessing the effect of mHealth interventions in improving maternal and neonatal care in low- and middle-income countries: a systematic review," PLOS One, vol. 11, no. 5, 2016.
+[11] F. Appiah, D. Dahal, and E. Larri-Quartey, "Determinants of early antenatal care uptake in Cameroon: evidence from the 2018 Demographic and Health Survey," BMC Pregnancy and Childbirth, vol. 22, 2022.
+[12] M. Amoakoh-Coleman, A. B. Borgstein, J. K. S. Sondaal, K. Klipstein-Grobusch, I. M. Engmann, and K. Karam, "Effectiveness of mHealth Interventions Targeting Health Care Workers to Improve Pregnancy Outcomes in Low- and Middle-Income Countries: A Systematic Review," Journal of Medical Internet Research, vol. 18, no. 8, 2016.
+[13] C. S. Hall, B. H. Fottrell, S. Wilkinson, and P. T. Byass, "Assessing the impact of mHealth interventions in low- and middle-income countries: what has been shown to work?" Global Health Action, vol. 7, 2014.
+[14] I. M. Rosenstock, "Historical origins of the health belief model," Health Education Monographs, vol. 2, no. 4, pp. 328–335, 1974.
+[15] I. Ajzen, "The theory of planned behavior," Organizational Behavior and Human Decision Processes, vol. 50, no. 2, pp. 179–211, 1991.
+[16] F. D. Davis, "Perceived usefulness, perceived ease of use, and user acceptance of information technology," MIS Quarterly, vol. 13, no. 3, pp. 319–340, 1989.
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+{
+  "name": "MHealth – Antenatal Care",
+  "short_name": "MHealth",
+  "description": "Antenatal Care Support System for pregnant women in Cameroon",
+  "theme_color": "#ee2b8c",
+  "background_color": "#f8f6f7",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical"],
+  "lang": "en"
+}
